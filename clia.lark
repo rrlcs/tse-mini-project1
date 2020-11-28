@@ -1,0 +1,9 @@
+start: (int | bool)+
+int: "x" | "y" | const
+     | op int int
+     | "-" int int
+const: 0 | 1
+op: "+"
+
+WHITESPACE: (" " | "\n" | "(" | ")")+
+%ignore WHITESPACE
