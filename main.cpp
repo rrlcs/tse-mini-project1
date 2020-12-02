@@ -155,7 +155,6 @@ int main(int argc, char* argv[])
     while(tmp)
     {
         constraint = getRandomConstraint(numOfOperator, ArithmaticOperandList, ArithmaticOperatorList, ComparisonOperandList, ComparisonOperatorList, LogicalOperandList, LogicalOperatorList);
-        // constraint = runCVC4(cmd1);
         constraint.erase(std::remove(constraint.begin(), constraint.end(), '\n'), constraint.end());
         if (constraint.find(func) != std::string::npos)
         {
@@ -166,7 +165,7 @@ int main(int argc, char* argv[])
             slFile << sygusFile;
             slFile.close();
             std::string program="\0";
-            std::string cmd = "timeout 0.1s cvc4 /home/ravi/Ubuntu-WSL-20/PSML/TSE/mini-project1/Dataset50000/"+name+" 2> /dev/null";
+            std::string cmd = "timeout 0.1s cvc4 ./Dataset50000/"+name+" 2> /dev/null";
             std::string result = runCVC4(cmd);
 
             auto t2 = std::chrono::high_resolution_clock::now();
