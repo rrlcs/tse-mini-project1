@@ -26,6 +26,8 @@ Download and extract data118618.json.gz
 ### Parser used to parse the programs is Lark Parser 
 Follow the instructions on https://github.com/lark-parser/lark to install lark parser
 
-### This project is being done under the course Topics in Software Engineering offered at Indian Institute of Science, Bangalore
 
-## Project Members: Ravi Raja
+
+
+This project is being done under the course Topics in Software Engineering offered at Indian Institute of Science, Bangalore
+Project Members: Ravi Raja
