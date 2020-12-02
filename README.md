@@ -18,7 +18,7 @@ python preprocessor.py
 ```
 
 ## To view the raw data
-Download datasetGeneratedForTSE50000.csv and open it with MS Excel
+Download "datasetGeneratedForTSE50000.csv" and open it with MS Excel
 
 ```
 S No.,    Constraints,                                                  Programs
@@ -28,7 +28,7 @@ S No.,    Constraints,                                                  Programs
 ```
 
 ## To view the preprocessed data
-Download and extract data118618.json.gz
+Download and extract "data118618.json.gz"
 It consists of 1118618 preprocessed data points.
 
 ```
