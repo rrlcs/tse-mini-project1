@@ -129,8 +129,7 @@ if __name__ == "__main__":
                     ('nor', 21), ('iff', 22), ('not', 23), ('beq', 24), ('leq', 25),
                     ('geq', 26), ('lt', 27), ('gt', 28), ('eq', 29),])
     ast_node_encoding = dict({'f':0, 'var1':1, 'var2':2, '=':3, '<':4, '>':5, '<=':6, '>=':7, 'and':8, 'or':9, 'not':10, '=>':12, '+':13, '-':14, '*':15, 'div':16, 'PAD1':17, 'PAD2':18, 'PAD3': 19})
-    # program_encoding = dict({'f':0, 'var1':1, 'var2':2, '=':3, '<':4, '>':5, '<=':6, '>=':7, 'and':8, 'or':9, 'not':10, 'ite':12, '+':13, '-':14, '*':15, 'div':16, '(':17, ')':18, 'num':19})
-
+   
     df = pd.read_csv("datasetGeneratedForTSE50000.csv")
     constraints = df['Constraints']
     programs = df['ExtractedPrograms']
