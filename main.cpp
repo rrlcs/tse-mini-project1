@@ -5,10 +5,7 @@
 #include <fstream>
 #include <chrono>
 #include <algorithm>
-// #include <string>
-//Header only libraries
 #include "expressionAst.h"
-// #include "expressionVisitors.h"
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -42,9 +39,6 @@ std::string insertConstraint(std::string templateFile, std::string constraint)
 }
 
 std::string runCVC4(std::string command) {
-    // std::cout<<command;
-        
-
    char buffer[128];
    std::string result = "";
 
@@ -56,12 +50,10 @@ std::string runCVC4(std::string command) {
 
    // read till end of process:
    while (!feof(pipe)) {
-    //    std::cout<<"in runCVC4\n";
       // use buffer to read and add to result
       if (fgets(buffer, 128, pipe) != NULL)
          result += buffer;
    }
-    // std::cout<<"res: "<<result;
    pclose(pipe);
    return result;
 }
@@ -80,13 +72,15 @@ std::string getRandomConstraint(int numOfOperator, std::vector<Formula *> Arithm
     FormulaBinaryExp *exp1;
     for(int i = 0; i<numOfOperator; i+=3)
         {
-            // std::cout<<i<<"\n";
+            // Generate expressions with arithmatic operators
             exp1 = new FormulaBinaryExp(*select_randomly(ArithmaticOperandList.begin(), ArithmaticOperandList.end()), *select_randomly(ArithmaticOperandList.begin(), ArithmaticOperandList.end()), *select_randomly(ArithmaticOperatorList.begin(), ArithmaticOperatorList.end()));
-            ArithmaticOperandList.push_back(exp1);
+            ArithmaticOperandList.push_back(exp1); // Add expression generated to the operand list
+            // Generate expressions with comparison operators
             exp1 = new FormulaBinaryExp(*select_randomly(ArithmaticOperandList.begin(), ArithmaticOperandList.end()), *select_randomly(ArithmaticOperandList.begin(), ArithmaticOperandList.end()), *select_randomly(ComparisonOperatorList.begin(), ComparisonOperatorList.end()));
-            ComparisonOperandList.push_back(exp1);
+            ComparisonOperandList.push_back(exp1); // Add expression generated to a new operand list
+            // Generate expressions with logical operators
             exp1 = new FormulaBinaryExp(*select_randomly(ComparisonOperandList.begin(), ComparisonOperandList.end()), *select_randomly(ComparisonOperandList.begin(), ComparisonOperandList.end()), *select_randomly(LogicalOperatorList.begin(), LogicalOperatorList.end()));
-            LogicalOperandList.push_back(exp1);
+            LogicalOperandList.push_back(exp1); // Add expression generated to a new operand list
         }
     std::string constraint = LogicalOperandList.back()->formulaToString();
     return constraint;
@@ -96,45 +90,55 @@ int main(int argc, char* argv[])
 {
     auto t1 = std::chrono::high_resolution_clock::now();
 
-    std::string filenum = argv[1];
-    std::string datapoints = argv[2];
-    int numOfParam = 2; // Initial Operands;
-    int numOfConst = 0;
-    int numOfUninterpretedFunct = 1;
+    std::string filenum = argv[1]; // number of sygus files already created in the Dataset directory
+    std::string datapoints = argv[2]; // Number of data points to generate
     int numOfOperator = 6;
+    
+    // Define Operand Lists
+    std::vector<Formula *> ArithmaticOperandList;
+    std::vector<Formula *> ComparisonOperandList;
+    std::vector<Formula *> LogicalOperandList;
+    
+    // Define Operator Lists
+    std::vector<ArithmaticOperator *> ArithmaticOperatorList;
+    std::vector<ComparisonOperator *> ComparisonOperatorList;
+    std::vector<LogicalOperator *> LogicalOperatorList;
 
-
+    // Initialize x and y operands
     FormulaVar *x = new FormulaVar("x");
     FormulaVar *y = new FormulaVar("y");
     
-    std::vector<Formula *> ArithmaticOperandList;
+    // Push x and y to arithmatic operand list
     ArithmaticOperandList.push_back(x);
     ArithmaticOperandList.push_back(y);
-
-    std::vector<Formula *> ComparisonOperandList;
-    std::vector<Formula *> LogicalOperandList;
-
+    
+    // Initialize arithmatic operators
     ArithmaticOperator *Plus = new ArithmaticOperator("+");
     ArithmaticOperator *Minus = new ArithmaticOperator("-");
-    std::vector<ArithmaticOperator *> ArithmaticOperatorList;
+    
+    // Push arith. operators to arith. operator list
     ArithmaticOperatorList.push_back(Plus);
     ArithmaticOperatorList.push_back(Minus);
 
+    // Initialize comparison operators
     ComparisonOperator *LT = new ComparisonOperator("<");
     ComparisonOperator *GT = new ComparisonOperator(">");
     ComparisonOperator *LEQ = new ComparisonOperator("<=");
     ComparisonOperator *GEQ = new ComparisonOperator(">=");
     ComparisonOperator *EQ = new ComparisonOperator("=");
-    std::vector<ComparisonOperator *> ComparisonOperatorList;
+    
+    // Push comparison operators to comparison operator list
     ComparisonOperatorList.push_back(LT);
     ComparisonOperatorList.push_back(GT);
     ComparisonOperatorList.push_back(LEQ);
     ComparisonOperatorList.push_back(GEQ);
     ComparisonOperatorList.push_back(EQ);
 
+    // Initialize logical operators
     LogicalOperator *And = new LogicalOperator("and");
     LogicalOperator *Or = new LogicalOperator("or");
-    std::vector<LogicalOperator *> LogicalOperatorList;
+    
+    // Push logical operators to logical operator list
     LogicalOperatorList.push_back(And);
     LogicalOperatorList.push_back(Or);
 
@@ -144,7 +148,7 @@ int main(int argc, char* argv[])
     ArithmaticOperandList.push_back(exp1);
     exp1 = new FormulaBinaryExp(y, x, f);
     ArithmaticOperandList.push_back(exp1);
-
+    
     std::string templateFile = "(set-logic LIA)\n(synth-fun f ((x Int) (y Int)) Int)\n(declare-var x Int)\n(declare-var y Int)\n(constraint $$)\n(check-synth)";
     int tmp = 1;
     std::string func = "f";
@@ -154,28 +158,30 @@ int main(int argc, char* argv[])
     std::string program_ext;
     while(tmp)
     {
+        // Generate Random Constraints
         constraint = getRandomConstraint(numOfOperator, ArithmaticOperandList, ArithmaticOperatorList, ComparisonOperandList, ComparisonOperatorList, LogicalOperandList, LogicalOperatorList);
         constraint.erase(std::remove(constraint.begin(), constraint.end(), '\n'), constraint.end());
+        
         if (constraint.find(func) != std::string::npos)
         {
-            // std::cout << "found!" << '\n';
             sygusFile = insertConstraint(templateFile, constraint);
-            std::string name = "randomlyGeneratedBenchmark_"+filenum+".sl";
+            std::string name = "randomlyGeneratedBenchmark_"+filenum+".sl"; // Create a SyGuS file for each randomly generated constraint
             std::ofstream slFile("Dataset50000/"+name);
-            slFile << sygusFile;
+            slFile << sygusFile; 
             slFile.close();
             std::string program="\0";
             std::string cmd = "timeout 0.1s cvc4 ./Dataset50000/"+name+" 2> /dev/null";
-            std::string result = runCVC4(cmd);
+            std::string result = runCVC4(cmd); // Pick the SyGuS files and run CVC4 on them
 
             auto t2 = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count(); // Compute the execution time for cvc4
             std::string execTime = std::to_string(duration);
+            
+            // Write the (constraint, program) pairs in a csv file,
+            // along with their execution times
             name = "datasetGeneratedForTSE"+datapoints+".csv";
             if(result == "\0")
             {
-                // std::cout<<"Error: Timeout";
                 writeToCSV(name, "\n"+filenum+","+constraint+","+"Timeout"+","+"Timeout"+","+execTime, true);
             }
             else if (result == "unknown\n")
@@ -194,20 +200,7 @@ int main(int argc, char* argv[])
             tmp = 0;
         }
     }
-    // std::cout<<constraint;
-    // std::cout<<"\n";
-
     
-
-    
-    
-    
-
-    
-    // std::cout << "Execution Time: " << duration;
-    // std::ofstream et("")
-
-    //new and delete. malloc and free. preferably don't mix.
     // free memory
     delete x;
     delete y;
@@ -221,6 +214,4 @@ int main(int argc, char* argv[])
     delete And;
     delete Or;
     delete exp1;
-    // delete exp2;
-    // delete exp3;
 }
